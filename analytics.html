@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Analytics - My Personal Site</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Finance Analytics</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="finance.html">Finance</a>
+            <a href="analytics.html">Analytics</a>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Analytics Overview</h2>
+            <canvas id="cashFlowChart" width="200" height="200"></canvas>
+            <canvas id="cashDistributionChart" width="150" height="150"></canvas>
+        </section>
+    </main>
+    <footer>
+        <p>Copyright: 2024 innoba. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', loadAnalyticsData);
+
+        function loadAnalyticsData() {
+            const data = JSON.parse(localStorage.getItem('financeData'));
+            if (data) {
+                const cashIn = [];
+                const cashOut = [];
+                const labels = [];
+                let totalCashIn = 0;
+                let totalCashOut = 0;
+
+                data.forEach(item => {
+                    labels.push(item.date); // Assuming date is unique and represents x-axis
+                    cashIn.push(parseFloat(item.cash_in) || 0);
+                    cashOut.push(parseFloat(item.cash_out) || 0);
+                    totalCashIn += parseFloat(item.cash_in) || 0;
+                    totalCashOut += parseFloat(item.cash_out) || 0;
+                });
+
+                // Create Cash Flow Chart
+                const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
+                new Chart(cashFlowCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Cash In',
+                                data: cashIn,
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Cash Out',
+                                data: cashOut,
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+
+                // Create Cash Distribution Pie Chart
+                const cashDistributionCtx = document.getElementById('cashDistributionChart').getContext('2d');
+                new Chart(cashDistributionCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Total Cash In', 'Total Cash Out'],
+                        datasets: [{
+                            data: [totalCashIn, totalCashOut],
+                            backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+                            borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+ maintainAspectRatio: true
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

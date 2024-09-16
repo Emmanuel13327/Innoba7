@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance - My Personal Site</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Finance</h1>
+         <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="finance.html">Finance</a>
+            <a href="analytics.html">Analytics</a>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Finance Tracker</h2>
+            <form id="financeForm" onsubmit="saveData(); return false;">
+                <table id="financeTable">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Date</th>
+                            <th>Cash In</th>
+                            <th>Cash Out</th>
+                            <th>Balance</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Table rows will be dynamically added here -->
+                    </tbody>
+                </table>
+                <br>
+                <button type="button" onclick="addRow()">Add</button>
+                <button type="submit">Save</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>Copyright: 2024 innoba. All rights reserved.</p>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', loadData); // Load data when the page loads
+
+    function addRow() {
+        const table = document.getElementById("financeTable").getElementsByTagName('tbody')[0];
+        const newRow = table.insertRow();
+
+        newRow.insertCell(0).innerHTML = `
+            <select name="day[]">
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
+            </select>
+        `;
+        newRow.insertCell(1).innerHTML = `<input type="date" name="date[]">`;
+        newRow.insertCell(2).innerHTML = `<input type="number" name="cash_in[]" placeholder="Cash In" oninput="calculateBalance(this)">`;
+        newRow.insertCell(3).innerHTML = `<input type="number" name="cash_out[]" placeholder="Cash Out" oninput="calculateBalance(this)">`;
+        newRow.insertCell(4).innerHTML = `<input type="number" name="balance[]" placeholder="Balance" readonly>`;
+        newRow.insertCell(5).innerHTML = `
+            <button type="button" onclick="editRow(this)">Edit</button>
+            <button type="button" onclick="deleteRow(this)">Delete</button>
+        `;
+    }
+
+    function calculateBalance(input) {
+        const row = input.closest('tr');
+        const cashIn = parseFloat(row.querySelector('input[name="cash_in[]"]').value) || 0;
+        const cashOut = parseFloat(row.querySelector('input[name="cash_out[]"]').value) || 0;
+        const balance = cashIn - cashOut;
+
+        row.querySelector('input[name="balance[]"]').value = balance.toFixed(2); // Set the balance
+    }
+
+    function saveData() {
+        const tableRows = document.querySelectorAll('#financeTable tbody tr');
+        let data = [];
+
+        tableRows.forEach(row => {
+            let rowData = {};
+            rowData.day = row.querySelector('select').value;
+            rowData.date = row.querySelector('input[name="date[]"]').value;
+            rowData.cash_in = row.querySelector('input[name="cash_in[]"]').value;
+            rowData.cash_out = row.querySelector('input[name="cash_out[]"]').value;
+            rowData.balance = row.querySelector('input[name="balance[]"]').value;
+            data.push(rowData);
+        });
+
+        localStorage.setItem('financeData', JSON.stringify(data)); // Save to localStorage
+        alert('Data saved successfully!');
+    }
+
+    function loadData() {
+        const data = JSON.parse(localStorage.getItem('financeData'));
+        if (data) {
+            data.forEach(item => {
+                const table = document.getElementById("financeTable").getElementsByTagName('tbody')[0];
+                const newRow = table.insertRow();
+                newRow.insertCell(0).innerHTML = `
+                    <select name="day[]">
+                        <option value="${item.day}">${item.day}</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
+                    </select>
+                `;
+                newRow.insertCell(1).innerHTML = `<input type="date" name="date[]" value="${item.date}">`;
+                newRow.insertCell(2).innerHTML = `<input type="number" name="cash_in[]" value="${item.cash_in}" placeholder="Cash In" oninput="calculateBalance(this)">`;
+                newRow.insertCell(3).innerHTML = `<input type="number" name="cash_out[]" value="${item.cash_out}" placeholder="Cash Out" oninput="calculateBalance(this)">`;
+                newRow.insertCell(4).innerHTML = `<input type="number" name="balance[]" value="${item.balance}" placeholder="Balance" readonly>`;
+                newRow.insertCell(5).innerHTML = `
+                    <button type="button" onclick="editRow(this)">Edit</button>
+                    <button type="button" onclick="deleteRow(this)">Delete</button>
+                `;
+            });
+        }
+    }
+
+    function editRow(button) {
+        const row = button.parentNode.parentNode;
+        const cells = row.getElementsByTagName('td');
+
+        const currentDay = cells[0].querySelector('select').value;
+        cells[0].innerHTML = `
+            <select name="day[]">
+                <option value="Monday" ${currentDay === 'Monday' ? 'selected' : ''}>Monday</option>
+                <option value="Tuesday" ${currentDay === 'Tuesday' ? 'selected' : ''}>Tuesday</option>
+                <option value="Wednesday" ${currentDay === 'Wednesday' ? 'selected' : ''}>Wednesday</option>
+                <option value="Thursday" ${currentDay === 'Thursday' ? 'selected' : ''}>Thursday</option>
+                <option value="Friday" ${currentDay === 'Friday' ? 'selected' : ''}>Friday</option>
+                <option value="Saturday" ${currentDay === 'Saturday' ? 'selected' : ''}>Saturday</option>
+                <option value="Sunday" ${currentDay === 'Sunday' ? 'selected' : ''}>Sunday</option>
+            </select>
+        `;
+
+        for (let i = 1; i < 5; i++) {
+            const cell = cells[i];
+            const currentValue = cell.innerHTML;
+            cell.innerHTML = `<input type="text" value="${currentValue}" name="field_${i}[]">`;
+        }
+
+        button.innerText = "Save";
+        button.onclick = function() { saveRow(this); };
+    }
+
+    function saveRow(button) {
+        const row = button.parentNode.parentNode;
+        const cells = row.getElementsByTagName('td');
+        const select = cells[0].querySelector('select');
+
+        cells[0].innerHTML = select.value;
+
+        for (let i = 1; i < 5; i++) {
+            const input = cells[i].querySelector('input');
+            cells[i].innerHTML = input.value;
+        }
+
+        button.innerText = "Edit";
+        button.onclick = function() { editRow(this); };
+    }
+
+    function deleteRow(button) {
+        const row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }
+    </script>
+</body>
+</html>
+
+

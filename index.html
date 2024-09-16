@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - My Personal Site</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Basic styles for the carousel */
+        .carousel {
+            position: relative;
+            max-width: 200px; /* Set max width for carousel */
+            max-height: 400px; /* Set max height for carousel */
+            margin: auto;
+            overflow: hidden;
+            border: 1px solid #ccc; /* Optional: add a border for visibility */
+        }
+        .carousel img {
+            width: 100%; /* Make images responsive */
+            height: auto; /* Maintain aspect ratio */
+            display: none; /* Hide images by default */
+            max-height: 250px; /* Set max height for images */
+        }
+        .carousel img.active {
+            display: block; /* Show active image */
+        }
+        .dots {
+            text-align: center; /* Center the dots */
+            padding: 10px 0; /* Add padding above and below */
+        }
+        .dot {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            margin: 0 5px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+            cursor: pointer;
+        }
+        .dot.active {
+            background-color: rgba(0, 0, 0, 1); /* Fully opaque for active dot */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Innoba</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="finance.html">Finance</a>
+            <a href="analytics.html">Analytics</a>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>
+            
+          
+            <div class="carousel">
+                <img src="images/image1.png" class="active" alt="Image 1">
+                <img src="images/image2.jpg" alt="Image 2">
+                <img src="images/image3.jpg" alt="Image 3">
+            </div>
+            <div class="dots">
+                <span class="dot active" onclick="setImage(0)"></span>
+                <span class="dot" onclick="setImage(1)"></span>
+                <span class="dot" onclick="setImage(2)"></span>
+            </div>
+        </section>
+</h2>
+    </main>
+    <footer>
+        <p>Copyright: 2024 innoba. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let currentIndex = 0;
+
+        function showImage(index) {
+            const images = document.querySelectorAll('.carousel img');
+            const dots = document.querySelectorAll('.dot');
+            images.forEach((img, i) => {
+                img.classList.remove('active');
+                dots[i].classList.remove('active'); // Remove active class from all dots
+                if (i === index) {
+                    img.classList.add('active');
+                    dots[i].classList.add('active'); // Add active class to the current dot
+                }
+            });
+        }
+
+        function nextImage() {
+            const images = document.querySelectorAll('.carousel img');
+            currentIndex = (currentIndex + 1) % images.length; // Loop back to the first image
+            showImage(currentIndex);
+        }
+
+        function prevImage() {
+            const images = document.querySelectorAll('.carousel img');
+            currentIndex = (currentIndex - 1 + images.length) % images.length; // Loop back to the last image
+            showImage(currentIndex);
+        }
+
+        function setImage(index) {
+            currentIndex = index;
+            showImage(currentIndex);
+        }
+
+        // Automatic slideshow (optional)
+        setInterval(nextImage, 5000); // Change image every 5 seconds
+    </script>
+</body>
+</html>
